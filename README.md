@@ -10,8 +10,10 @@ I build products *with* AI, not models from scratch. These notes are me pulling 
 
 - **Note 01 — How vLLM works** (below) — inference-engine internals: PagedAttention, continuous batching, the KV cache manager.
 - **[Note 02 — KTransformers, ELI5: a 671B model on one gaming GPU →](./ktransformers-eli5.md)** — CPU/GPU hybrid inference for giant Mixture-of-Experts models.
+- **[Note 03 — Attention from scratch, ELI5: it really is just 4 operations →](./attention-from-scratch.md)** — the primitive at the bottom of the stack (matmul, transpose, scale, softmax), in ~100 lines of C.
+- **[Note 04 — CUDA Graphs, ELI5: stop paying the launch tax →](./cuda-graphs.md)** — why the decode loop starves the GPU, and how capture-and-replay fixes it.
 
-**Related repo:** [Agent Swarms for Multi-Angle Analysis →](https://github.com/wilsonwu-ai/agent-swarms)
+**Related repos:** [Agent Swarms →](https://github.com/wilsonwu-ai/agent-swarms) · [How Kimi scales open models →](https://github.com/wilsonwu-ai/scaling-open-models) · [AI Engineer roadmap →](https://github.com/wilsonwu-ai/ai-engineer-roadmap)
 
 ---
 
