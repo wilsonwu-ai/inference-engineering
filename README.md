@@ -6,7 +6,12 @@ I build products *with* AI, not models from scratch. These notes are me pulling 
 
 > **Note 01 was prompted by [@maxxfuu](https://x.com/maxxfuu)'s Inference Engineering series — Day 11/90 ([tweet + animation](https://x.com/maxxfuu/status/2078056064906658113)).** His post is what sent me down the rabbit hole. The explanation and diagrams below are my own; corrections and PRs welcome.
 
-**Related note:** [Agent Swarms for Multi-Angle Analysis →](https://github.com/wilsonwu-ai/agent-swarms)
+## Notes in this series
+
+- **Note 01 — How vLLM works** (below) — inference-engine internals: PagedAttention, continuous batching, the KV cache manager.
+- **[Note 02 — KTransformers, ELI5: a 671B model on one gaming GPU →](./ktransformers-eli5.md)** — CPU/GPU hybrid inference for giant Mixture-of-Experts models.
+
+**Related repo:** [Agent Swarms for Multi-Angle Analysis →](https://github.com/wilsonwu-ai/agent-swarms)
 
 ---
 
