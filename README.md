@@ -130,7 +130,7 @@ sequenceDiagram
         M->>G: forward pass — writes each token's K,V into its block (slot mapping)
         G-->>M: logits
         M->>M: sample next token per request
-        M-->>S: tokens out; finished requests free their blocks
+        M-->>S: tokens out — finished requests free their blocks
     end
 ```
 
