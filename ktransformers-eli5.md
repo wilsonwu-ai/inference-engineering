@@ -66,7 +66,7 @@ sequenceDiagram
     G->>G: attention over the sequence (uses KV cache)
     G->>G: router picks the few active experts
     G->>C: hidden state + "run experts 12 and 87"
-    Note over C: only the ACTIVE experts, INT4 matmul
+    Note over C: only the ACTIVE experts, 4-bit weights -> INT8 matmul
     C->>C: compute those few expert FFNs
     C-->>G: expert outputs
     G->>G: combine, move to next layer
@@ -75,7 +75,7 @@ sequenceDiagram
 The counterintuitive part: **won't the CPU be hopelessly slow?** It isn't, for two reasons:
 
 1. **You only compute a handful of experts per token**, not all 256. The CPU's job is tiny — it's sparse.
-2. **Modern CPUs have matrix engines.** Intel **AMX** (Advanced Matrix Extensions) does INT8/INT4 matrix math *in hardware*, and KTransformers ships hand-tuned AMX / AVX-512 kernels. The experts are stored **4-bit quantized**, so each one is small and fast to multiply. Add **NUMA-aware** placement so each CPU socket touches its own memory, and the sparse expert math keeps pace with the GPU's dense attention.
+2. **Modern CPUs have matrix engines.** Intel **AMX** (Advanced Matrix Extensions) does INT8 (and BF16) matrix math *in hardware*, and KTransformers ships hand-tuned AMX / AVX-512 kernels. The experts are stored **4-bit quantized** and dequantized to INT8 for the AMX matmul, so each one is small and fast to multiply. Add **NUMA-aware** placement so each CPU socket touches its own memory, and the sparse expert math keeps pace with the GPU's dense attention.
 
 So the two halves run where they're each strongest: **GPU does the dense, latency-critical work; CPU does the big, sparse, quantized work.**
 
@@ -87,7 +87,7 @@ KTransformers doesn't fork every model. It uses a **template-based injection sys
 flowchart LR
     M["Original HuggingFace model modules"] --> RULE{"YAML injection rules"}
     RULE -->|"match: attention"| K1["GPU kernel (Marlin / FP8)"]
-    RULE -->|"match: MoE experts"| K2["CPU kernel (AMX INT4, offloaded)"]
+    RULE -->|"match: MoE experts"| K2["CPU kernel (AMX INT8, offloaded)"]
     RULE -->|"no match"| K3["leave the original module as-is"]
 ```
 
