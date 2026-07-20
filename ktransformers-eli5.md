@@ -2,7 +2,7 @@
 
 **[← back to the series](./README.md)**
 
-There's a class of open models — DeepSeek-R1/V3, Kimi-K2, GLM — with **671 billion** parameters. To hold one at full precision you'd need well over a terabyte of GPU memory: a rack of data-center cards. Yet [**KTransformers**](https://github.com/wilsonwu-ai/ktransformers) (MADSys Lab @ Tsinghua + Approaching.AI, [SOSP 2025](https://github.com/kvcache-ai/ktransformers)) runs it on **one consumer 24 GB GPU** plus ordinary system RAM — at usable speeds, up to **3–28× faster** than the CPU-only alternative.
+There's a class of open models — DeepSeek-R1/V3, Kimi-K2, GLM — with **671 billion** parameters. To hold one at full precision you'd need well over a terabyte of GPU memory: a rack of data-center cards. Yet [**KTransformers**](https://github.com/wilsonwu-ai/ktransformers) (MADSys Lab @ Tsinghua + Approaching.AI, [SOSP 2025](https://github.com/kvcache-ai/ktransformers)) runs it on **one consumer 24 GB GPU** plus ordinary system RAM — at usable speeds. The peer-reviewed [SOSP 2025 paper](https://dl.acm.org/doi/10.1145/3731569.3764843) reports **4.62–19.74× faster prefill and 1.25–4.09× faster decode** than existing hybrid systems (the project's older headline claimed up to ~28× over CPU-only llama.cpp).
 
 This note is the ELI5 of *how*. The whole trick rests on one property of these models, so let's start there.
 
@@ -12,10 +12,10 @@ This note is the ELI5 of *how*. The whole trick rests on one property of these m
 
 ```mermaid
 flowchart LR
-    M["DeepSeek-R1: 671B params (about 380 GB at 4-bit)"] -. "will not fit" .-> G["one consumer GPU: 24 GB VRAM"]
+    M["DeepSeek-R1: 671B params (~380 GB in a 4-bit build)"] -. "will not fit" .-> G["one consumer GPU: 24 GB VRAM"]
 ```
 
-380 GB doesn't go into 24 GB. Game over — unless the model is secretly mostly *idle*.
+380 GB doesn't go into 24 GB. (Pure 4-bit weights are ~336 GB; a real build keeps attention, shared experts, and embeddings at higher precision, so it lands near ~380 GB — of which the ~350 GB of routed experts is what gets offloaded to DRAM.) Game over — unless the model is secretly mostly *idle*.
 
 ## The secret: these are Mixture-of-Experts (MoE) models
 
